@@ -1,0 +1,47 @@
+#query winning counts for different openings
+SELECT game.winner, COUNT(*)
+FROM game
+LEFT JOIN opening_eco ON game.game_id = opening_eco.game_id
+WHERE opening_eco.opening_name = {{table1.selectedRow.data.opening_name}}
+GROUP BY game.winner;
+
+
+#finds opening like the user input
+SELECT opening_name 
+FROM opening_eco
+WHERE opening_name ILIKE {{'%' + textInput1.value + '%'}}
+GROUP BY opening_name;
+
+
+#find information on games based on play selection of opening
+select game.game_id, game.white_id, game.black_id, game.victory_status, game.winner
+FROM game
+LEFT JOIN opening_eco
+ON game.game_id = opening_eco.game_id
+WHERE opening_eco.opening_name = {{table1.selectedRow.data.opening_name}};
+
+
+#find moves in specific game
+select moves.moves
+FROM moves
+WHERE moves.game_id = {{table2.selectedRow.data.game_id}}
+
+#returns games that match search criteria from users
+SELECT game.game_id, game.turns, game.white_id, game.black_id, game.winner, player.white_rating AS white_rating, player.black_rating as black_rating, time_control.minutes, time_control.increment, opening_eco.opening_name FROM game
+LEFT JOIN player ON game.white_id = player.player_name
+LEFT JOIN time_control ON game.game_id = time_control.game_id
+LEFT JOIN opening_eco ON game.game_id = opening_eco.game_id
+WHERE ({{!textInput5.value}} or opening_eco.opening_name ILIKE {{'%' + textInput5.value + '%'}})
+AND ({{!textInput2.value}} or game.game_id ILIKE {{'%' + textInput2.value + '%'}})
+AND ({{!textInput4.value}} or game.white_id ILIKE {{'%' + textInput4.value + '%'}})
+AND ({{!textInput3.value}} or game.black_id ILIKE {{'%' + textInput3.value + '%'}});
+
+
+# returns all games order by number of turns
+SELECT game_id, rated, white_id, black_id, victory_status, winner,turns from game ORDER BY turns DESC;
+
+#returns count of different types of victories
+select DISTINCT victory_status, COUNT(*) FROM victory_status GROUP BY victory_status;
+
+#returns game by number of turns for graphing
+SELECT DISTINCT game_id, turns FROM moves ORDER BY turns DESC LIMIT 100;
